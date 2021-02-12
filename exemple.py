@@ -1,10 +1,3 @@
-# Pitwi
-
-Module for terminal/console user interface.
-
-# Aperçu
-
-```python
 from pitwi import *
 
 (
@@ -13,4 +6,3 @@ from pitwi import *
     .add(Text('Paf'), row=2, column=2)
     .run()
 )
-```
