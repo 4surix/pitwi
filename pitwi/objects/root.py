@@ -9,6 +9,7 @@ from time import sleep
 
 from .. import binding
 from .. import terminal
+from . import navigation
 from .zone import Zone
 
 
@@ -24,7 +25,14 @@ class Root(Zone):
         self.width -= 1
         self.height -= 1
 
+    def active(self):
+        pass
+
+    def inactive(self):
+        pass
+
     def run(self, *, block=True):
+        navigation.add(self)
         Zone.run(self, 1, 1, self.width, self.height)
         if block:
             while True: sleep(60)

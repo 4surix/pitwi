@@ -3,6 +3,7 @@
 # ----------------------------------------------------------------------------
 
 from threading import Thread
+from . import navigation
 from . import keypress
 
 
@@ -13,10 +14,20 @@ def add(carac, function):
     binds[carac] = function
 
 
+entry_active = None
+
 def run():
+
     while True:
         key = keypress.getName()
         binds.get(key, lambda : None)()
+
+        if key == 'Tab':
+            navigation.next()
+            continue
+
+        if entry_active:
+            entry_active.add(key)
 
 
 p = Thread(target=run)
