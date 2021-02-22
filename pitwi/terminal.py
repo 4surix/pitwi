@@ -72,7 +72,6 @@ def run():
     while True:
         while datas:
             sys.stdout.write(datas.pop(0))
-        sleep(1)
 
 p = Thread(target=run)
 p.daemon = True
