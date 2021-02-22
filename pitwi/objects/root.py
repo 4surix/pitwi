@@ -7,6 +7,7 @@ import os
 from time import sleep
 
 
+from .. import ids
 from .. import binding
 from .. import terminal
 from . import navigation
@@ -40,3 +41,7 @@ class Root(Zone):
     def bind(self, carac, function):
         binding.add(carac, function)
         return self
+
+    def setid(self, **kwargs):
+        for id, element in kwargs.items():
+            ids.set(id, element)
