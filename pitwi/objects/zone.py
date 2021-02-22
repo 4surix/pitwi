@@ -12,7 +12,15 @@ from .. import colors as COLORS
 
 class Zone:
 
-    def __init__(self, *, color:str = None, border:str = None, id:str = None):
+    def __init__(
+            self,
+            *,
+            color:str = None,
+            border:str = None,
+            id:str = None,
+
+            **kwargs
+        ):
 
         self.color = color
         self.border = border
@@ -24,6 +32,11 @@ class Zone:
 
         if id:
             ids.set(id, self)
+
+    def copy(self, **kwargs):
+        attrs = {**self.__dict__}
+        attrs.update(kwargs)
+        return Zone(**attrs)
 
     def add(
             self, 

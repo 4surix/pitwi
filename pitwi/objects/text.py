@@ -16,7 +16,9 @@ class Text:
             bg:str = None, 
             fg:str = None, 
             border = None,
-            id:str = None
+            id:str = None,
+
+            **kwargs
         ):
 
         self.value = str(value)
@@ -28,6 +30,11 @@ class Text:
 
         if id:
             ids.set(id, self)
+
+    def copy(self, **kwargs):
+        attrs = {**self.__dict__}
+        attrs.update(kwargs)
+        return Text(**attrs)
 
     def set(self, value):
         self.value = str(value)

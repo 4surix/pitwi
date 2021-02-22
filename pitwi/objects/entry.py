@@ -25,7 +25,9 @@ class Entry:
             border:Border = None, 
             key:str = 'Return', 
             function:Callable[[str], None] = lambda value: None,
-            id:str = None
+            id:str = None,
+
+            **kwargs
         ):
 
         self.value = ''
@@ -41,6 +43,11 @@ class Entry:
 
         if id:
             ids.set(id, self)
+
+    def copy(self, **kwargs):
+        attrs = {**self.__dict__}
+        attrs.update(kwargs)
+        return Entry(**attrs)
 
     def run(
             self,

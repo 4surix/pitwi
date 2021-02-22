@@ -12,7 +12,16 @@ from .. import terminal
 
 class Scrolling:
 
-    def __init__(self, value, *, bg = None, fg = None, border = None):
+    def __init__(
+            self,
+            value,
+            *,
+            bg:str = None,
+            fg:str = None,
+            border = None,
+
+            **kwargs
+        ):
 
         self.value = str(value)
 
@@ -20,6 +29,11 @@ class Scrolling:
         self.fg = fg
 
         self.border = border
+
+    def copy(self, **kwargs):
+        attrs = {**self.__dict__}
+        attrs.update(kwargs)
+        return Scrolling(**attrs)
 
     def set(self, value):
         self.value = str(value)
