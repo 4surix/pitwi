@@ -65,11 +65,11 @@ class Border:
             )
 
             + (
-                '' if not(self.O or self.E)
+                '' if not (self.O or self.E)
                 else
                     ''.join(
                         f"\033[{y + i};{x}H" + self.O 
-                        + f"\033[{y + i};{width}H" + self.E
+                        + f"\033[{y + i};{x + width - 1}H" + self.E
                         for i in range(1, height - 1)
                     )
             )
