@@ -1,3 +1,10 @@
+
+__title__ = "pitwi"
+__version__ = "0.2.0"
+__author__ = "Asurix"
+__github__ = "https://github.com/4surix/pitwi"
+
+
 import colorama
 
 from .objects import *
