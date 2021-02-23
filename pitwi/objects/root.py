@@ -45,3 +45,4 @@ class Root(Zone):
     def setid(self, **kwargs):
         for id, element in kwargs.items():
             ids.set(id, element)
+        return self
