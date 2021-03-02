@@ -10,7 +10,7 @@ from time import sleep
 from .. import ids
 from .. import binding
 from .. import terminal
-from . import navigation
+from .. import navigation
 from .zone import Zone
 
 
