@@ -2,10 +2,6 @@
 # Python 3.6.2
 # ----------------------------------------------------------------------------
 
-import os
-
-from time import sleep
-
 
 from .. import ids
 from .zone import Zone
