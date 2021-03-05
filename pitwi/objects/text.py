@@ -60,25 +60,6 @@ class Text:
         if self.border:
             x, y, width, height = self.border.run(x, y, width, height)
 
-        i = 0
-        h = 0
-
         COLOR = COLORS.FG.get(self.fg, '') + COLORS.BG.get(self.bg, '')
-        RESET = COLORS.FG.get('reset') + COLORS.BG.get('reset')
 
-        value = self.value
-
-        if x - 1:
-            value = value.replace('\n', '\n' + f"\033[{x - 1}C")
-
-        while i < len(value) and h < height:
-
-            terminal.write(
-                f"\033[{y + h};{x}H"
-                + COLOR
-                + value[i : i + width]
-                + RESET
-            )
-
-            i += width
-            h += 1
+        terminal.format_and_write(self.value, x, y, width, height, COLOR)

@@ -120,9 +120,6 @@ class Entry:
         else:
             self.value += key
 
-        i = 0
-        h = 0
-
         COLOR = COLORS.FG.get(self._fg, '') + COLORS.BG.get(self._bg, '')
         RESET = COLORS.FG.get('reset') + COLORS.BG.get('reset')
 
@@ -133,14 +130,6 @@ class Entry:
         if len_max < len(value):
             value = value[:len_max - 3] + '...'
  
-        while i <= len(value) and h < self.height:
-
-            terminal.write(
-                f"\033[{self.y + h};{self.x}H"
-                + COLOR
-                + value[i : i + self.width]
-                + RESET
-            )
-
-            i += self.width
-            h += 1
+        terminal.format_and_write(
+            value, self.x, self.y, self.width, self.height, COLOR
+        )

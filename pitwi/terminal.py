@@ -16,6 +16,9 @@ from threading import Thread
 from time import sleep
 
 
+from . import colors
+
+
 current_os = platform.system()
 
 if current_os == 'Windows':
@@ -92,3 +95,43 @@ def run():
 p = Thread(target=run)
 p.daemon = True
 p.start()
+
+def format_and_write(value, x, y, width, height, COLOR):
+
+    i = h = 0
+
+    data = ''
+    surplus = 0
+
+    RESET = colors.FG.get('reset') + colors.BG.get('reset')
+
+    while i < len(value) and h < height:
+
+        part = part__ = value[i : i + width - surplus]
+
+        nl = 0
+        index = 0
+
+        while '\n' in part:
+            nl += 1
+            index = part__.index('\n')
+            part__ = part__.replace('\n', ' ', 1)
+            part = part.replace('\n', f"\033[{y + h + nl};{x}H", 1)
+
+        data += (
+            f"\033[{y + h};{surplus + x}H"
+            + COLOR
+            + part
+            + RESET
+        )
+
+        i += width - surplus
+        h += 1 + nl
+
+        surplus = 0
+
+        if index:
+            h -= 1
+            surplus = len(part__) - index - 1 # \n
+
+    datas.append(data)
