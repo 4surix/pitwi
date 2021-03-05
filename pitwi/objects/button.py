@@ -31,6 +31,11 @@ class Button:
             function:Callable[[str], None] = lambda value: None,
             id:str = None,
 
+            row:int = 0,
+            column:int = 0,
+            spanrow:int = 0,
+            spancolumn:int = 0,
+
             **kwargs
         ):
 
@@ -46,6 +51,11 @@ class Button:
 
         self.key = key
         self.function = function
+
+        self.row = row
+        self.column = column
+        self.spanrow = spanrow
+        self.spancolumn = spancolumn
 
         if id:
             ids.set(id, self)

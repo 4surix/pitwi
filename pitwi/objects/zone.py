@@ -19,16 +19,20 @@ class Zone:
             border:str = None,
             id:str = None,
 
+            rows:int = 0,
+            columns:int = 0,
+            childs:list = [],
+
             **kwargs
         ):
 
         self.color = color
         self.border = border
 
-        self.rows = 0
-        self.columns = 0
+        self.rows = rows
+        self.columns = columns
 
-        self.childs = []
+        self.childs = childs if childs else []
 
         if id:
             ids.set(id, self)
@@ -36,7 +40,7 @@ class Zone:
     def copy(self, **kwargs):
         attrs = {**self.__dict__}
         attrs.update(kwargs)
-        return Zone(**attrs)
+        return Zone(childs = [c.copy() for c in attrs.pop('childs')], **attrs)
 
     def add(
             self, 
@@ -72,7 +76,7 @@ class Zone:
             for h in range(height):
                 terminal.write(
                     f"\033[{y + h};{x}H"
-                    + color 
+                    + color
                     + ' ' * width
                     + reset
                 )

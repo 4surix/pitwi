@@ -6,6 +6,7 @@ from threading import Thread
 from time import sleep
 
 
+from .. import ids
 from .. import colors as COLORS
 from .. import terminal
 
@@ -20,6 +21,11 @@ class Scrolling:
             fg:str = None,
             border = None,
 
+            row:int = 0,
+            column:int = 0,
+            spanrow:int = 0,
+            spancolumn:int = 0,
+
             **kwargs
         ):
 
@@ -29,6 +35,14 @@ class Scrolling:
         self.fg = fg
 
         self.border = border
+
+        self.row = row
+        self.column = column
+        self.spanrow = spanrow
+        self.spancolumn = spancolumn
+       
+        if id:
+            ids.set(id, self)
 
     def copy(self, **kwargs):
         attrs = {**self.__dict__}

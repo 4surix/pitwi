@@ -16,6 +16,11 @@ class Carousel:
             border:str = None,
             id:str = None,
 
+            row:int = 0,
+            column:int = 0,
+            spanrow:int = 0,
+            spancolumn:int = 0,
+
             **kwargs
         ):
 
@@ -24,6 +29,11 @@ class Carousel:
         self.index = 0
 
         self.childs = []
+
+        self.row = row
+        self.column = column
+        self.spanrow = spanrow
+        self.spancolumn = spancolumn
 
         if id:
             ids.set(id, self)
