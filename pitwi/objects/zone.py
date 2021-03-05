@@ -81,6 +81,9 @@ class Zone:
                     + reset
                 )
 
+        if not self.columns or not self.rows:
+            return
+
         wzone = width // self.columns
         hzone = height // self.rows
 
