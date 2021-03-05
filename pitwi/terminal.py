@@ -6,8 +6,11 @@
 
 import os
 import sys
+import shlex
 import struct
+import colorama
 import platform
+import subprocess
 
 from threading import Thread
 from time import sleep
@@ -37,6 +40,11 @@ if current_os == 'Windows':
             sizey = bottom - top + 1
             return sizex, sizey
 
+        else:
+            cols = int(subprocess.check_call(shlex.split('tput cols')))
+            rows = int(subprocess.check_call(shlex.split('tput lines')))
+            return cols, rows
+
 elif current_os in ['Linux', 'Darwin'] or current_os.startswith('CYGWIN'):
 
     import fcntl
@@ -62,6 +70,10 @@ elif current_os in ['Linux', 'Darwin'] or current_os.startswith('CYGWIN'):
         return int(cr[1]), int(cr[0])
 
 
+sys_stdout = sys.stdout
+
+colorama.init()
+
 datas = []
 
 def write(data):
@@ -71,7 +83,11 @@ def write(data):
 def run():
     while True:
         while datas:
-            sys.stdout.write(datas.pop(0))
+            sys.stdout.write(
+                datas.pop(0)
+                .encode(sys_stdout.encoding, 'replace')
+                .decode(sys_stdout.encoding, 'replace')
+            )
 
 p = Thread(target=run)
 p.daemon = True
