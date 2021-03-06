@@ -65,6 +65,7 @@ class Zone:
         self.childs.append(child)
 
         if self._info:
+            terminal.clear(*self._info)
             self.run(*self._info)
 
         return self
@@ -93,6 +94,7 @@ class Zone:
                     child__.column -= child.spancolumn
 
         if self._info:
+            terminal.clear(*self._info)
             self.run(*self._info)
 
         return self

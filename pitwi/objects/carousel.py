@@ -59,22 +59,13 @@ class Carousel:
         self.width = width
         self.height = height
 
-    def clear(self):
-
-        value = ''
-
-        for h in range(self.height):
-            value += f"\033[{self.y + h};{self.x}H" + ' ' * self.width
-
-        terminal.write(value)
-
     def change(self, index:int):
 
         if index < 0 or index >= len(self.childs):
             return
 
         self.index = index
-        self.clear()
+        terminal.clear(self.x, self.y, self.width, self.height)
         self.childs[index].run(self.x, self.y, self.width, self.height)
 
     def next(self):
@@ -86,5 +77,5 @@ class Carousel:
         if self.index >= len(self.childs):
             self.index = 0
 
-        self.clear()
+        terminal.clear(self.x, self.y, self.width, self.height)
         child.run(self.x, self.y, self.width, self.height)

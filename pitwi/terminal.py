@@ -135,3 +135,13 @@ def format_and_write(value, x, y, width, height, COLOR):
             surplus = len(part__) - index - 1 # \n
 
     datas.append(data)
+
+
+def clear(x, y, width, height):
+
+    value = ''
+
+    for h in range(height):
+        value += f"\033[{y + h};{x}H" + ' ' * width
+
+    datas.append(value)

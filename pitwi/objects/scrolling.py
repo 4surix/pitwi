@@ -40,6 +40,8 @@ class Scrolling:
         self.column = column
         self.spanrow = spanrow
         self.spancolumn = spancolumn
+
+        self._info = None
        
         if id:
             ids.set(id, self)
@@ -51,7 +53,10 @@ class Scrolling:
 
     def set(self, value):
         self.value = str(value)
-        self.run(*self._info)
+        
+        if self._info:
+            terminal.clear(*self._info)
+            self.run(*self._info)
 
     def run(self, x, y, width, height):
 
