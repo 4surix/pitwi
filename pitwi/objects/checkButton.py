@@ -19,10 +19,10 @@ class CheckButton(Button):
 
         self.value = values[0]
 
-    def copy(self, **kwargs):
+    def copy(self, *values, **kwargs):
         attrs = {**self.__dict__}
         attrs.update(kwargs)
-        return CheckButton(*self.values, **attrs)
+        return CheckButton(*(values or self.values), **attrs)
 
     def change_value(self):
 

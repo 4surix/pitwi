@@ -60,8 +60,9 @@ class Button:
         if id:
             ids.set(id, self)
 
-    def copy(self, **kwargs):
+    def copy(self, value=None, **kwargs):
         attrs = {**self.__dict__}
+        attrs['value'] = value or self.value
         attrs.update(kwargs)
         return Button(**attrs)
 

@@ -21,6 +21,8 @@ class Carousel:
             spanrow:int = 0,
             spancolumn:int = 0,
 
+            childs:list = None,
+
             **kwargs
         ):
 
@@ -28,7 +30,7 @@ class Carousel:
 
         self.index = 0
 
-        self.childs = []
+        self.childs = childs or []
 
         self.row = row
         self.column = column
@@ -41,7 +43,7 @@ class Carousel:
     def copy(self, **kwargs):
         attrs = {**self.__dict__}
         attrs.update(kwargs)
-        return Carousel(**attrs)
+        return Carousel(childs = [c.copy() for c in attrs.pop('childs')], **attrs)
 
     def add(self, child):
         self.childs.append(child)
