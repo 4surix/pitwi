@@ -78,8 +78,19 @@ class Zone:
 
         self.childs.remove(child)
 
-        self.rows = max(child.row + child.spanrow - 1 for child in self.childs)
-        self.columns = max(child.column + child.spancolumn - 1 for child in self.childs)
+        if child.row <= self.rows:
+            self.rows -= child.spanrow
+
+            for child__ in self.childs:
+                if child__.row > child.row:
+                    child__.row -= child.spanrow
+
+        if child.column <= self.columns:
+            self.columns -= child.spancolumn
+
+            for child__ in self.childs:
+                if child__.column > child.column:
+                    child__.column -= child.spancolumn
 
         if self._info:
             self.run(*self._info)
