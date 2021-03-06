@@ -1,6 +1,6 @@
 
 __title__ = "pitwi"
-__version__ = "0.3.0"
+__version__ = "0.4.0"
 __author__ = "Asurix"
 __github__ = "https://github.com/4surix/pitwi"
 
