@@ -1,0 +1,46 @@
+<root width="80" height="12">
+    <style>
+        entry {
+            fg: red;
+            active-fg: green;
+        }
+        #temperature {
+            border: simple;
+            border-color: lime;
+        }
+        #vent {
+            border: simple;
+            border-color: teal;
+        }
+        .titre {
+            fg: white;
+        }
+    </style>
+
+    <text id="titre"></text>
+    <area id="temperature" spanrow="4">
+        <text class="titre" row="1" column="1" spancolumn="2">Température :</text>
+        <text id="min_temp" row="2" column="1"></text>
+        <text id="max_temp" row="2" column="2"></text>
+    </area>
+    <area id="vent" spanrow="4">
+        <text class="titre" row="1" column="1" spancolumn="2">Vent :</text>
+        <text id="vit_vent" row="2" column="1"></text>
+        <text id="dir_vent" row="2" column="2"></text>
+    </area>
+    <entry id="choix_ville">{"Ville : "}</entry>
+
+    <script>
+        import requests
+
+        def maj(ville):
+            ID = requests.get(f"https://www.metaweather.com/api/location/search/?query={ville}").json()[0]['woeid']
+            info = requests.get(f"https://www.metaweather.com/api/location/{ID}").json()['consolidated_weather'][0]
+            titre.set(f"Météo de la ville de {ville}")
+            min_temp.set(f"Minimum : {round(info['min_temp'])}°C")
+            max_temp.set(f"Maximum : {round(info['max_temp'])}°C")
+            vit_vent.set(f"Vitesse : {round(info['wind_speed'] * 1.60934)}km/h")
+            dir_vent.set(f"Direction : {round(info['wind_direction'])}°")
+        choix_ville.function = maj
+    </script>
+</root>

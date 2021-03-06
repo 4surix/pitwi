@@ -1,0 +1,47 @@
+<root width="80" height="31">
+    <style>
+        #parent {
+            border: simple;
+        }
+        #path {
+            border: simple;
+        }
+        button {
+            fg: red;
+            active-fg: green;
+        }
+    </style>
+
+    <area>
+        <button id="parent" row="1" column="1">...</button>
+        <text id="path" row="1" column="2" spancolumn="9"></text>
+    </area>
+    <area id="liste" spanrow="9">
+        <ignore>
+            <button id="dir"></button>
+            <text id="file"></text>
+        </ignore>
+    </area>
+
+    <script>
+        import os
+
+        PATH = os.getcwd()
+
+        def set_maj(path__):
+            global PATH; PATH = path__; path.set(PATH)
+
+            for child in list(liste.childs):
+                liste.rem(child)
+
+            for f in os.listdir(PATH):
+                if os.path.isfile(os.path.join(PATH, f)):
+                    liste.add(file.copy(f))
+                else:
+                    liste.add(dir.copy(f, function = lambda p=os.path.join(PATH, f): set_maj(p)))
+
+        parent.function = lambda: set_maj(os.path.dirname(PATH))
+
+        set_maj(PATH)
+    </script>
+</root>
