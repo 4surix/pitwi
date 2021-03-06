@@ -34,6 +34,8 @@ class Zone:
 
         self.childs = childs if childs else []
 
+        self._info = None
+
         if id:
             ids.set(id, self)
 
@@ -62,9 +64,31 @@ class Zone:
 
         self.childs.append(child)
 
+        if self._info:
+            self.run(*self._info)
+
+        return self
+
+    def rem(
+            self, 
+            child
+        ):
+
+        child.parent = None
+
+        self.childs.remove(child)
+
+        self.rows = max(child.row + child.spanrow - 1 for child in self.childs)
+        self.columns = max(child.column + child.spancolumn - 1 for child in self.childs)
+
+        if self._info:
+            self.run(*self._info)
+
         return self
 
     def run(self, x:int, y:int, width:int, height:int) -> None:
+
+        self._info = (x, y, width, height)
 
         if self.border:
             x, y, width, height = self.border.run(x, y, width, height)
