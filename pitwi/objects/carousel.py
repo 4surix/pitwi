@@ -37,6 +37,8 @@ class Carousel:
         self.spanrow = spanrow
         self.spancolumn = spancolumn
 
+        self.parent = None
+
         if id:
             ids.set(id, self)
 
@@ -79,3 +81,8 @@ class Carousel:
 
         terminal.clear(self.x, self.y, self.width, self.height)
         child.run(self.x, self.y, self.width, self.height)
+
+    def delete(self):
+
+        if self.parent:
+            self.parent.rem(self)

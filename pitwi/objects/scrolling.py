@@ -42,6 +42,8 @@ class Scrolling:
         self.spancolumn = spancolumn
 
         self._info = None
+
+        self.parent = None
        
         if id:
             ids.set(id, self)
@@ -105,3 +107,8 @@ class Scrolling:
         p = Thread(target=start)
         p.daemon = True
         p.start()
+
+    def delete(self):
+
+        if self.parent:
+            self.parent.rem(self)

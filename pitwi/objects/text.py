@@ -40,6 +40,8 @@ class Text:
 
         self._info = None
 
+        self.parent = None
+
         if id:
             ids.set(id, self)
 
@@ -69,3 +71,8 @@ class Text:
         COLOR = COLORS.FG.get(self.fg, '') + COLORS.BG.get(self.bg, '')
 
         terminal.format_and_write(self.value, x, y, width, height, COLOR)
+
+    def delete(self):
+
+        if self.parent:
+            self.parent.rem(self)

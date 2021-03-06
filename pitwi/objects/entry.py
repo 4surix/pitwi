@@ -15,6 +15,8 @@ from .. import navigation
 
 class Entry:
 
+    navigation = navigation
+
     def __init__(
             self,
             *, 
@@ -58,6 +60,8 @@ class Entry:
         self.column = column
         self.spanrow = spanrow
         self.spancolumn = spancolumn
+
+        self.parent = None
 
         if id:
             ids.set(id, self)
@@ -133,3 +137,10 @@ class Entry:
         terminal.format_and_write(
             value, self.x, self.y, self.width, self.height, COLOR
         )
+
+    def delete(self):
+
+        if self.parent:
+            self.parent.rem(self)
+
+        navigation.rem(self)

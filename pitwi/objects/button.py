@@ -15,6 +15,8 @@ from ..objects import Border
 
 class Button:
 
+    navigation = navigation
+
     def __init__(
             self,
             value:str = '',
@@ -58,6 +60,8 @@ class Button:
         self.spancolumn = spancolumn
 
         self._info = None
+
+        self.parent = None
 
         if id:
             ids.set(id, self)
@@ -112,3 +116,10 @@ class Button:
     def add(self, key:str):
         if key == self.key:
             self.function()
+
+    def delete(self):
+
+        if self.parent:
+            self.parent.rem(self)
+
+        navigation.rem(self)

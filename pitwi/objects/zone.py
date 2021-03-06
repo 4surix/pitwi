@@ -36,6 +36,8 @@ class Zone:
 
         self._info = None
 
+        self.parent = None
+
         if id:
             ids.set(id, self)
 
@@ -77,6 +79,7 @@ class Zone:
 
         child.parent = None
 
+        child.delete()
         self.childs.remove(child)
 
         if child.row <= self.rows:
@@ -133,3 +136,8 @@ class Zone:
             height = hzone * child.spanrow
 
             child.run(x__, y__, width, height)
+
+    def delete(self):
+
+        if self.parent:
+            self.parent.rem(self)
