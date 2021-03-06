@@ -254,7 +254,7 @@ def decode_css(data, variables):
     return infos
 
 
-def run(data:str, variables=None):
+def text(data:str, variables=None):
 
     variables = variables if variables else {}
 
@@ -278,9 +278,9 @@ def run(data:str, variables=None):
     return root
 
 
-def run_file(path, variables=None):
+def file(path, variables=None):
 
     with open(path, encoding='utf-8') as file:
         data = file.read()
 
-    return run(data, variables)
+    return text(data, variables)
