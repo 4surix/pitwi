@@ -34,27 +34,40 @@ if name_system == 'Linux':
 
     import sys, tty, termios
 
-    def getKey() -> str:
+    class GetKey:
 
-        key = ''
-        
-        descripteur_fichier:int = sys.stdin.fileno()
-        anciens_parametres = termios.tcgetattr(descripteur_fichier)
+        listened = False
 
-        try:
-            # Définit le mode du descripteur de fichier à row.
-            tty.setraw(descripteur_fichier)
+        def __call__(self) -> str:
+
+            key = ''
+            
+            self.listen()
+
             # Lis le prochain caractère.
-            key = sys.stdin.read(1)
+            try: key = sys.stdin.read(1)
+            finally:
+                key = key if self.listened else ''
+                # Remet les valeurs du descripteur de fichier comme avant
+                #   après la transmission de toute sortie en file d’attente.
+                self.unlisten()
 
-        finally:
-            # Remet les valeurs du descripteur de fichier comme avant
-            #   après la transmission de toute sortie en file d’attente.
-            termios.tcsetattr(
-                descripteur_fichier, termios.TCSADRAIN, anciens_parametres
-            )
+            return key
 
-        return key
+        def listen(self):
+            self.descripteur_fichier:int = sys.stdin.fileno()
+            self.anciens_parametres = termios.tcgetattr(self.descripteur_fichier)
+            tty.setraw(self.descripteur_fichier)
+            self.listened = True
+
+        def unlisten(self):
+            if self.listened:
+                termios.tcsetattr(
+                    self.descripteur_fichier, termios.TCSADRAIN, self.anciens_parametres
+                )
+                self.listened = False
+
+    getKey = GetKey()
 
 elif name_system == 'Windows':
 
@@ -67,6 +80,9 @@ elif name_system == 'Windows':
             time.sleep(0.1)
 
         return chr(getch()[0])
+
+    getKey.listen = lambda: None
+    getKey.unlisten = lambda: None
 
 elif name_system == 'Darwin':
 
@@ -82,6 +98,9 @@ elif name_system == 'Darwin':
 
         else:
             return chr(GetNextEvent(0x0008)[1][1] & 0x000000FF)
+
+    getKey.listen = lambda: None
+    getKey.unlisten = lambda: None
 
 
 COMBI_CTRL = {

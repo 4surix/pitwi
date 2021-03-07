@@ -6,22 +6,24 @@
 
 import os
 import sys
-import shlex
 import struct
 import colorama
 import platform
-import subprocess
 
 from threading import Thread
 from time import sleep
 
 
 from . import colors
+from . import keypress
 
 
 current_os = platform.system()
 
 if current_os == 'Windows':
+
+    import shlex
+    import subprocess
 
     from ctypes import windll, create_string_buffer
 
@@ -84,17 +86,28 @@ def write(data):
 
 
 def run():
+
     while True:
-        while datas:
-            sys.stdout.write(
-                datas.pop(0)
-                .encode(sys_stdout.encoding, 'replace')
-                .decode(sys_stdout.encoding, 'replace')
-            )
+
+        if datas:
+
+            keypress.getKey.unlisten()
+
+            while datas:
+                sys.stdout.write(
+                    datas.pop(0)
+                    .encode(sys_stdout.encoding, 'replace')
+                    .decode(sys_stdout.encoding, 'replace')
+                )
+
+            sys.stdout.flush()
+
+            keypress.getKey.listen()
 
 p = Thread(target=run)
 p.daemon = True
 p.start()
+
 
 def format_and_write(value, x, y, width, height, COLOR):
 
@@ -145,3 +158,17 @@ def clear(x, y, width, height):
         value += f"\033[{y + h};{x}H" + ' ' * width
 
     datas.append(value)
+
+
+def clearall():
+    if platform.system() == 'Windows':
+        os.system(f'cls')
+    else:
+        os.system(f"clear")
+
+
+def resize(width, height):
+    if platform.system() == 'Windows':
+        os.system(f'mode {width}, {height}')
+    else:
+        os.system(f"printf '\033[8;{height};{width}t'")

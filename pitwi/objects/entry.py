@@ -15,8 +15,6 @@ from .. import navigation
 
 class Entry:
 
-    navigation = navigation
-
     def __init__(
             self,
             *, 
