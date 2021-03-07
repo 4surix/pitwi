@@ -42,3 +42,15 @@ from pitwi import parser
 
 parser.file('NAME_OF_YOUR_FILE.xml').run()
 ```
+
+## Weater
+
+![weater](https://cdn.discordapp.com/attachments/557310650569850881/817915701620506694/syyhLr5L76.gif)
+
+> [weater.xml](https://github.com/4surix/pitwi/blob/main/exemples/weather.xml)
+
+## File explorer
+
+![file_explorer](https://cdn.discordapp.com/attachments/557310650569850881/817915760570793994/phVuxs5gRt.gif)
+
+> [file_explorer.xml](https://github.com/4surix/pitwi/blob/main/exemples/file_explorer.xml)
