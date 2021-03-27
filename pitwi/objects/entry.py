@@ -61,6 +61,8 @@ class Entry:
 
         self.parent = None
 
+        self.index_char = 0
+
         if id:
             ids.set(id, self)
 
@@ -111,16 +113,39 @@ class Entry:
         end = ''
 
         if key == 'BackSpace':
-            self.value = self.value[:-1]
+            self.value = (
+                self.value[:self.index_char - 1]
+                + ''
+                + self.value[self.index_char:]
+            )
             end = " "
+            self.index_char -= 1
 
         elif key == self.key:
             self.function(self.value)
             end = ' ' * len(self.value)
             self.value = ''
+            self.index_char = 0
+
+        elif key == "Right":
+            if self.index_char != len(self.value):
+                self.index_char += 1
+                terminal.write("\033[1C")
+            return
+
+        elif key == "Left":
+            if self.index_char != 0:
+                self.index_char -= 1
+                terminal.write("\033[1D")
+            return
 
         else:
-            self.value += key
+            self.value = (
+                self.value[:self.index_char]
+                + key
+                + self.value[self.index_char:]
+            )
+            self.index_char += 1
 
         COLOR = COLORS.FG.get(self._fg, '') + COLORS.BG.get(self._bg, '')
         RESET = COLORS.FG.get('reset') + COLORS.BG.get('reset')
@@ -131,7 +156,7 @@ class Entry:
 
         if len_max < len(value):
             value = value[:len_max - 3] + '...'
- 
+
         terminal.format_and_write(
             value, self.x, self.y, self.width, self.height, COLOR
         )
