@@ -34,3 +34,14 @@ def next():
         index = 0
 
     boxs[index].active()
+
+
+def rem_all_childs_of_widget_hide(child):
+    for child in getattr(child, 'childs', []):
+        try: child.childs
+        except:
+            pass
+        else:
+            rem_all_childs_of_widget_hide(child)
+        finally:
+            rem(child)

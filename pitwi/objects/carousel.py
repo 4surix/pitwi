@@ -7,6 +7,7 @@ from typing import Union
 
 from .. import ids
 from .. import terminal
+from .. import navigation
 from .. import colors as COLORS
 
 
@@ -28,7 +29,7 @@ class Carousel:
 
         self.border = border
 
-        self.index = 0
+        self.index = -1
 
         self.childs = childs or []
 
@@ -66,13 +67,16 @@ class Carousel:
         if index < 0 or index >= len(self.childs):
             return
 
+        navigation.rem_all_childs_of_widget_hide(self.childs[self.index])
+
         self.index = index
+
         terminal.clear(self.x, self.y, self.width, self.height)
         self.childs[index].run(self.x, self.y, self.width, self.height)
 
     def next(self):
 
-        child = self.childs[self.index]
+        navigation.rem_all_childs_of_widget_hide(self.childs[self.index])
 
         self.index += 1
 
@@ -80,7 +84,7 @@ class Carousel:
             self.index = 0
 
         terminal.clear(self.x, self.y, self.width, self.height)
-        child.run(self.x, self.y, self.width, self.height)
+        self.childs[self.index].run(self.x, self.y, self.width, self.height)
 
     def delete(self):
 
