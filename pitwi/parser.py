@@ -22,6 +22,13 @@ def Script(data, variables):
     exec('if True:\n' + data, variables)
 
 
+def Function(data, variables, args):
+    return lambda *args__: (
+        variables.update(zip(args, args__)),
+        exec('if True:\n' + data, variables)
+    )
+
+
 def Ignore():
     pass
 
@@ -40,7 +47,8 @@ widgets = {
     'area': Zone,
     'style': Style,
     'script': Script,
-    'ignore': Ignore
+    'ignore': Ignore,
+    'function': Function
 }
 
 borders = {
@@ -169,6 +177,15 @@ def parser_in(widget_parent, node, variables):
             widget((child.text if child.text else ''), variables)
             continue
 
+        elif widget == Function:
+            if isinstance(widget_parent, (Entry, Button)):
+                widget_parent.function = widget(
+                    (child.text if child.text else ''),
+                    variables,
+                    child.attrib.get('args', "").split(' ')
+                )
+            continue
+
 
         if id__:
             variables[id__] = widget
@@ -262,6 +279,7 @@ def text(data:str, variables=None):
     variables.update({k: k for k in COLORS.BG})
     variables.update(borders)
     variables['space'] = lambda value: ' ' * value
+    variables['COLORS'] = COLORS
 
     base = ET.fromstring(
         data
