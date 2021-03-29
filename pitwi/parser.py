@@ -30,6 +30,14 @@ def Function(data, variables, args):
     )
 
 
+def Bind(data, variables, key, alias):
+    binding.add(key, lambda: exec('if True:\n' + data, variables))
+
+    for alias in alias:
+        if alias:
+            binding.add(alias, lambda: exec('if True:\n' + data, variables))
+
+
 def Tile():
     pass
 
@@ -56,6 +64,7 @@ widgets = {
     'ignore': Ignore,
     'function': Function,
     'tile': Tile,
+    'bind': Bind,
 }
 
 borders = {
@@ -213,6 +222,15 @@ def parser_in(widget_parent, node, variables):
                     check_childtext(child, variables),
                     child.attrib.get('collision') == 'true'
                 )
+            continue
+
+        elif widget == Bind:
+            widget(
+                (child.text if child.text else ''),
+                variables,
+                child.attrib.get('key'),
+                child.attrib.get('alias', '').split(' '),
+            )
             continue
 
 
