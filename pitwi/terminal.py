@@ -4,6 +4,7 @@
 # - http://stackoverflow.com/questions/566746/how-to-get-console-window-width-in-python
 
 
+import re
 import os
 import sys
 import struct
@@ -118,9 +119,52 @@ def format_and_write(value, x, y, width, height, COLOR):
 
     RESET = colors.FG.get('reset') + colors.BG.get('reset')
 
-    while i < len(value) and h < height:
+    has_escape_chars = '\033' in value
 
-        part = part__ = value[i : i + width - surplus]
+    if has_escape_chars:
+        value_split = [
+            value
+            for i, value in enumerate(
+                re.split('((\033\\[[0-9]+;[0-9]+H|\033\\[[0-9]{2}m)+)', value)
+                ,
+                1
+            )
+            if i % 3 != 0
+        ]
+
+    len_value = len(value.replace('\n', ''))
+
+    while i < len_value and h < height:
+
+        if has_escape_chars:
+
+            def get_part(width):
+
+                i = 0
+                part__ = ''
+
+                for index, part in enumerate([*value_split]):
+
+                    if index % 2 != 0:
+                        value_split.pop(0)
+                        part__ += part
+                        continue
+
+                    for char in part:
+                        i += 1
+                        part__ += char
+                        value_split[0] = value_split[0][1:]
+                        if i >= width:
+                            return part__
+
+                    value_split.pop(0)
+
+                return part__
+
+            part = part__ = get_part(width - surplus)
+
+        else:
+            part = part__ = value[i : i + width - surplus]
 
         nl = 0
         index = 0
@@ -128,7 +172,7 @@ def format_and_write(value, x, y, width, height, COLOR):
         while '\n' in part:
             nl += 1
             index = part__.index('\n')
-            part__ = part__.replace('\n', ' ', 1)
+            part__ = part__.replace('\n', '', 1)
             part = part.replace('\n', f"\033[{y + h + nl};{x}H", 1)
 
         data += (
@@ -145,7 +189,7 @@ def format_and_write(value, x, y, width, height, COLOR):
 
         if index:
             h -= 1
-            surplus = len(part__) - index - 1 # \n
+            surplus = len(part__) - index
 
     datas.append(data)
 
