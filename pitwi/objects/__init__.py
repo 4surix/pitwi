@@ -8,3 +8,4 @@ from .button import Button
 from .carousel import Carousel
 from .scrolling import Scrolling
 from .checkButton import CheckButton
+from .map import Map

@@ -7,6 +7,7 @@ import xml.etree.ElementTree as ET
 
 from .objects import *
 from .ids import IDS
+from . import binding
 from . import colors as COLORS
 
 
@@ -29,6 +30,10 @@ def Function(data, variables, args):
     )
 
 
+def Tile():
+    pass
+
+
 def Ignore():
     pass
 
@@ -45,10 +50,12 @@ widgets = {
     'scrolling': Scrolling,
     'zone': Zone,
     'area': Zone,
+    'map': Map,
     'style': Style,
     'script': Script,
     'ignore': Ignore,
-    'function': Function
+    'function': Function,
+    'tile': Tile,
 }
 
 borders = {
@@ -173,6 +180,14 @@ def parser_in(widget_parent, node, variables):
         elif widget == Entry:
             widget = widget(textleft=check_childtext(child, variables), **child.attrib)
 
+        elif widget == Map:
+            matrix = {}
+            for line in check_childtext(child, variables).strip().split('\n'):
+                for index, value in enumerate(line.strip().split()):
+                    matrix.setdefault(index, []).append(value)
+            value = list(matrix.values())
+            widget = widget(value, **child.attrib)
+
         elif widget in (Style, Script):
             widget((child.text if child.text else ''), variables)
             continue
@@ -183,6 +198,15 @@ def parser_in(widget_parent, node, variables):
                     (child.text if child.text else ''),
                     variables,
                     child.attrib.get('args', "").split(' ')
+                )
+            continue
+
+        elif widget == Tile:
+            if isinstance(widget_parent, (Map)):
+                widget_parent.tile(
+                    child.attrib.get('name'),
+                    check_childtext(child, variables),
+                    child.attrib.get('collision') == 'true'
                 )
             continue
 
