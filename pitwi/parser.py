@@ -139,12 +139,12 @@ def parser_in(widget_parent, node, variables):
 
         style = STYLES.get(child.tag, {}).copy()
 
-        id__ = child.attrib.get('id')
+        id__ = child.attrib.get('id', '').replace('-', '_')
         class__ = child.attrib.get('class')
 
         if class__:
             for c__ in class__.split(' '):
-                style.update(STYLES.get('.' + c__, {}))
+                style.update(STYLES.get('.' + c__.replace('-', '_'), {}))
 
         if id__:
             style.update(STYLES.get('#' + id__, {}))
@@ -153,6 +153,11 @@ def parser_in(widget_parent, node, variables):
 
         if border:
             style['border'] = border.copy(color=style.get('border_color'))
+
+        border = style.get('active_border')
+
+        if border:
+            style['active_border'] = border.copy(color=style.get('active_border_color'))
 
         child.attrib.update(style)
 
@@ -275,7 +280,7 @@ def decode_css(data, variables):
             pass
 
         elif carac == '{':
-            infos[value.strip()] = info = {}
+            infos[value.strip().replace('-', '_')] = info = {}
             value = ''
 
         elif carac == '}':
