@@ -330,8 +330,8 @@ def text(data:str, variables=None):
 
     base = ET.fromstring(
         data
-        .replace(" < ", " &lt; ")
-        .replace(" > ", " &gt; ")
+        .replace("\\<", "&lt;")
+        .replace("\\>", "&gt;")
     )
 
     root = Root(**base.attrib)
