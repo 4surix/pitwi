@@ -76,3 +76,6 @@ class Text:
 
         if self.parent:
             self.parent.rem(self)
+
+
+    Fish = lambda value = None, *args, **kwargs: Text(value or "  _\n><_>", *args, **kwargs)

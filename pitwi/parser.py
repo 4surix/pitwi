@@ -49,6 +49,7 @@ def Ignore():
 widgets = {
     'root': Root,
     'text': Text,
+    'fish': Text.Fish,
     'border': Border,
     'button': Button,
     'carousel': Carousel,
@@ -174,7 +175,7 @@ def parser_in(widget_parent, node, variables):
         if widget in (Zone, Carousel):
             widget = widget(**child.attrib)
 
-        elif widget in (Text, Button, Scrolling):
+        elif widget in (Text, Text.Fish, Button, Scrolling):
             widget = widget(check_childtext(child, variables), **child.attrib)
 
         elif widget == CheckButton:
