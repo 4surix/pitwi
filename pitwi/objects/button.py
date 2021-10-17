@@ -129,7 +129,7 @@ class Button:
 
     def add(self, key:str):
         if key == self.key:
-            self.function()
+            self.function(self.value)
 
     def delete(self):
 
