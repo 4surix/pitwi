@@ -342,7 +342,7 @@ def parser_in(widget_parent, node, variables):
         if widget == Ignore or widget_parent == Ignore:
             pass
 
-        elif isinstance(widget_parent, Menu):
+        elif isinstance(widget_parent, (Carousel, Menu)):
             widget_parent.add(
                 child.attrib.pop('value-button'), 
                 widget
