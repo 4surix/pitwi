@@ -51,21 +51,23 @@ class Map:
 
 
         # Check lenght lines y, for IndexError.
+        if self.map:
+            max_len_y = max(len(y) for y in self.map)
 
-        max_len_y = max(len(y) for y in self.map)
-
-        for y in self.map:
-            while len(y) < max_len_y:
-                y.append(None)
+            for y in self.map:
+                while len(y) < max_len_y:
+                    y.append(None)
 
 
-        self.tiles = {}
+        self.tiles = {
+            None: "  "
+        }
 
         self.collisions = []
 
         self.pos = {
             'x': round(len(self.map) / 2), 
-            'y': round(len(self.map[0]) / 2)
+            'y': round(len(self.map[0]) / 2) if self.map else 0
         }
 
         self.row = row
@@ -109,9 +111,49 @@ class Map:
         elif key == 'Down':
             self.moveDown()
 
-    def set(self, x, y, value):
-        self.map[x][y] = value
+    def get_case(self, x, y):
+
+        try: case = self.map[x][y]
+        except:
+            return
+        else:
+            return case
+
+    def add_case(
+            self,
+            x = None, y = None, value = None,
+        ):
+        if x != None and y != None:
+            if len(self.map) <= x:
+                self.map.extend([] for _ in range(x - len(self.map) + 1))
+            if len(self.map[x]) <= y:
+                self.map[x].extend([None] * (y - len(self.map[x]) + 1))
+
+            self.map[x][y] = value
+
+        return self
+
+    def set(
+            self,
+            x = None, y = None, value = None,
+            *,
+            bg = None, fg = None,
+            border = None
+        ):
+        if x != None and y != None:
+            if len(self.map) <= x:
+                self.map.extend([] for _ in range(x - len(self.map) + 1))
+            if len(self.map[x]) <= y:
+                self.map[x].extend([None] * (y - len(self.map[x]) + 1))
+
+            self.map[x][y] = value
+
+        if bg: self.bg = bg
+        if fg: self.fg = fg
+        if border: self.border = border
+
         self.move(0, 0)
+
         return self
 
     def copy(self, value=None, **kwargs):
@@ -147,15 +189,12 @@ class Map:
         min_y = 0
         max_y = len(self.map[0])
 
+        # Sub 1 because case pos not count
         cote_w = int(
-            (self.width - 1) / 4 if self.width % 2 == 0 
-            else
-                self.width / 4
+            (int(self.width / 2) - 1) / 2
         )
         cote_h = int(
-            (self.height - 1) / 2 if self.height % 2 == 0 
-            else
-                self.height / 2
+            (self.height - 1 if self.height % 2 == 0 else self.height) / 2
         )
 
         min_range_x = max(self.pos['x'] - cote_w, 0)
@@ -167,7 +206,7 @@ class Map:
         spacesL = (
             '' if min_range_x != min_x
             else
-                ' ' * round(
+                ' ' * int(
                     (self.width - (max_range_x - min_range_x) * 2) 
                     / 
                     (1 + (max_range_x == max_x))
@@ -181,6 +220,9 @@ class Map:
                     (self.width - (max_range_x - min_range_x) * 2) 
                     /
                     (1 + (min_range_x == min_x))
+                    # If width is not even add one longueur
+                    +
+                    (0 if self.width % 2 == 0 else 1)
                 )
         )
 
@@ -201,11 +243,11 @@ class Map:
                 if self.pos['x'] == x and self.pos['y'] == y:
                     text += (
                         COLOR_POS 
-                        + self.tiles.get(self.map[x][y], '??')
+                        + self.tiles.get(self.get_case(x, y), '??')
                         + RESET_COLOR
                     )
                 else:
-                    text += self.tiles.get(self.map[x][y], '??')
+                    text += self.tiles.get(self.get_case(x, y), '??')
 
             text += spacesR
 
@@ -220,8 +262,12 @@ class Map:
 
     def move(self, x, y):
 
-        if self.map[self.pos['x'] + x][self.pos['y'] + y] in self.collisions:
+        try: case = self.map[self.pos['x'] + x][self.pos['y'] + y]
+        except:
             return
+        else:
+            if case in self.collisions:
+                return
 
         self.pos['x'] += x
         self.pos['y'] += y
@@ -269,6 +315,8 @@ class Map:
 
         self._info = (x, y, width, height)
 
+        input(width)
+
         if self._border:
             x, y, width, height = self._border.run(x, y, width, height)
 
@@ -276,6 +324,8 @@ class Map:
         self.y = y
         self.width = width
         self.height = height
+
+        input(width)
 
         self.move(0, 0)
 

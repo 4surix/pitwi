@@ -90,9 +90,23 @@ class Button:
 
         self.run(*self._info)
 
-    def set(self, value):
-        self.value = str(value)
-        
+    def set(
+            self, 
+            value = None, 
+            *,
+            bg = None, fg = None, 
+            active_bg = None, active_fg = None, 
+            border = None,
+            active_border = None
+        ):
+        if value: self.value = str(value)
+        if bg: self.bg = bg
+        if fg: self.fg = fg
+        if border: self.border = border
+        if active_bg: self.active_bg = active_bg
+        if active_fg: self.active_fg = active_fg
+        if active_border: self.active_border = active_border
+
         if self._info:
             terminal.clear(*self._info)
             self.run(*self._info)

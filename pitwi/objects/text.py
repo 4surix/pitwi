@@ -51,9 +51,12 @@ class Text:
         attrs.update(kwargs)
         return Text(**attrs)
 
-    def set(self, value):
-        self.value = str(value)
-        
+    def set(self, value = None, *, bg = None, fg = None, border = None):
+        if value: self.value = str(value)
+        if bg: self.bg = bg
+        if fg: self.fg = fg
+        if border: self.border = border
+
         if self._info:
             terminal.clear(*self._info)
             self.run(*self._info)

@@ -2,7 +2,11 @@
 # Python 3.6.2
 # ----------------------------------------------------------------------------
 
+import copy
+import random
 import xml.etree.ElementTree as ET
+
+from collections.abc import Iterable
 
 
 from .objects import *
@@ -42,6 +46,14 @@ def Tile():
     pass
 
 
+def Case():
+    pass
+
+
+def Cases():
+    pass
+
+
 def Ignore():
     pass
 
@@ -65,6 +77,8 @@ widgets = {
     'ignore': Ignore,
     'function': Function,
     'tile': Tile,
+    'case': Case,
+    'cases': Cases,
     'bind': Bind,
 }
 
@@ -78,42 +92,78 @@ borders = {
 }
 
 
-def check_childtext(child, variables):
+def gen_random_var():
+    return '__' + ''.join(
+        random.choice('azertyuiopqsdfghjklmwxcvbn')
+        for _ in range(20)
+    )
 
-    if not child.text:
-        return ''
 
-    text = child.text.strip()
+def check_elements(widget, variables, simple=False):
+
+    if simple:
+        elements = [widget]
+    else:
+        elements = [widget.text.strip() if widget.text else '']
+
+        for element in widget:
+            elements.append(element)
+            elements.append(element.tail.strip() if element.tail else '')
+
+    childs = []
 
     parts = []
-    begin = end = -1
-    begin_index = end_index = 0
+    part = ''
+    in_comprehention = False
+    in_text = False
+    last_symbol_text = None
+    deep = 0
 
-    while True:
+    is_widget = True
 
-        try: begin_index = text.index('{', begin_index)
-        except ValueError:
-            parts.append(text[end + 1 :])
-            break
-        else:
-            if begin_index + 1 < len(text) and text[begin_index + 1] == '{':
-                text = text[:begin_index] + '{' + text[begin_index + 2:]
+    for element in elements:
+
+        is_widget = not is_widget
+
+        if is_widget:
+            if in_comprehention:
+                id__ = element.attrib.get('id')
+                
+                if not id__:
+                    id__ = gen_random_var()
+
+                part += (' __config_attrib_element(' + id__ + ', vars()) ')
+                variables[id__] = element
             else:
-                begin = begin_index
-                parts.append(text[end + 1 : begin])
-            begin_index += 1
-
-        try: end_index = text.index('}', end_index)
-        except ValueError:
-            parts.append(text[end + 1 :])
-            break
+                childs.append(element)
         else:
-            if end_index + 1 < len(text) and text[end_index + 1] == '}':
-                text = text[:end_index] + '}' + text[end_index + 2:]
-            else:
-                end = end_index
-                parts.append(text[begin + 1 : end])
-            end_index += 1
+            for carac in element:
+
+                if carac == '{' and not in_text:
+                    if deep == 0:
+                        in_comprehention = True
+                        parts.append(part.strip())
+                        part = ''
+                    deep += 1
+                elif carac == '}' and not in_text:
+                    deep -= 1
+                    if deep == 0:
+                        in_comprehention = False
+                        parts.append(part.strip())
+                        part = ''
+                elif carac == '"' or carac == "'":
+                    if last_symbol_text == carac:
+                        in_text = False
+                        last_symbol_text = None
+                    else:
+                        in_text = True
+                        last_symbol_text = carac
+                    part += carac
+                else:
+                    part += carac
+
+    parts.append(part.strip())
+    part = ''
 
     text = ''
     is_eval = True
@@ -126,7 +176,16 @@ def check_childtext(child, variables):
             continue
         
         if is_eval:
-            text += str(eval(part.replace('\n', ' '), variables))
+            result = eval('(' + part.replace('\n', ' ') + ')', variables)
+
+            if simple:
+                value = result
+            elif isinstance(result, str):
+                text += result
+            elif isinstance(result, Iterable):
+                childs.extend(result)
+            else:
+                childs.append(result) 
         else:
             text += (
                 (' ' if part[0] == ' ' else '') 
@@ -134,7 +193,13 @@ def check_childtext(child, variables):
                 + (' ' if part[-1] == ' ' else '')
             )
 
-    return text
+            if simple:
+                value = text
+
+    if simple:
+        return value
+    else:
+        return text, childs
 
 
 def parser_in(widget_parent, node, variables):
@@ -146,6 +211,14 @@ def parser_in(widget_parent, node, variables):
         if not widget:
             continue
 
+        childs = []
+
+        variables.update(child.attrib.pop('__local_vars', {}))
+
+        child.attrib = {
+            key: check_elements(value, variables, simple=True)
+            for key, value in child.attrib.items()
+        }
 
         style = STYLES.get(child.tag, {}).copy()
 
@@ -176,10 +249,11 @@ def parser_in(widget_parent, node, variables):
             widget = widget(**child.attrib)
 
         elif widget in (Text, Text.Fish, Button, Scrolling):
-            widget = widget(check_childtext(child, variables), **child.attrib)
+            widget = widget(text, **child.attrib)
 
         elif widget == CheckButton:
-            widget = widget(*check_childtext(child, variables).split(';'), **child.attrib)
+            text, childs = check_elements(child, variables)
+            widget = widget(*text.split(';'), **child.attrib)
 
         elif widget == Menu:
             widget = widget(**child.attrib)
@@ -193,15 +267,12 @@ def parser_in(widget_parent, node, variables):
             )
 
         elif widget == Entry:
-            widget = widget(textleft=check_childtext(child, variables), **child.attrib)
+            text, childs = check_elements(child, variables)
+            widget = widget(textleft=text, **child.attrib)
 
         elif widget == Map:
-            matrix = {}
-            for line in check_childtext(child, variables).strip().split('\n'):
-                for index, value in enumerate(line.strip().split()):
-                    matrix.setdefault(index, []).append(value)
-            value = list(matrix.values())
-            widget = widget(value, **child.attrib)
+            text, childs = check_elements(child, variables)
+            widget = widget([], **child.attrib)
 
         elif widget in (Style, Script):
             widget((child.text if child.text else ''), variables)
@@ -218,11 +289,39 @@ def parser_in(widget_parent, node, variables):
 
         elif widget == Tile:
             if isinstance(widget_parent, (Map)):
+                text, childs = check_elements(child, variables)
                 widget_parent.tile(
                     child.attrib.get('name'),
-                    check_childtext(child, variables),
+                    text,
                     child.attrib.get('collision') == 'true'
                 )
+            continue
+
+        elif widget == Case:
+            if isinstance(widget_parent, (Map)):
+                text, childs = check_elements(child, variables)
+                widget_parent.add_case(
+                    child.attrib.get('x'),
+                    child.attrib.get('y'),
+                    text
+                )
+            continue
+
+        elif widget == Cases:
+            matrix = {}
+
+            for line in text.strip().split('\n'):
+                for index, value in enumerate(line.strip().split()):
+                    matrix.setdefault(index, []).append(value)
+
+            for x, line in enumerate(list(matrix.values())):
+                for y, value in enumerate(line):
+                    widget_parent.add_case(
+                        x,
+                        y,
+                        text
+                    )
+
             continue
 
         elif widget == Bind:
@@ -257,7 +356,7 @@ def parser_in(widget_parent, node, variables):
             )
 
 
-        parser_in(widget, child, variables)
+        parser_in(widget, childs, variables)
 
 
 def decode_css(data, variables):
@@ -328,6 +427,12 @@ def text(data:str, variables=None):
     variables.update(borders)
     variables['space'] = lambda value: ' ' * value
     variables['COLORS'] = COLORS
+
+    def __config_attrib_element(element, local_vars):
+        element = copy.deepcopy(element)
+        element.attrib.update({'__local_vars': local_vars.copy()})
+        return element
+    variables['__config_attrib_element'] = __config_attrib_element
 
     base = ET.fromstring(
         data
