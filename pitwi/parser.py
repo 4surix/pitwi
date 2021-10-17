@@ -249,6 +249,7 @@ def parser_in(widget_parent, node, variables):
             widget = widget(**child.attrib)
 
         elif widget in (Text, Text.Fish, Button, Scrolling):
+            text, childs = check_elements(child, variables)
             widget = widget(text, **child.attrib)
 
         elif widget == CheckButton:
