@@ -1,0 +1,135 @@
+<!--
+Pitwi 0.5.1
+______________________________________________________________________________
+!-->
+
+<root width="60" height="10">
+    <style>
+        entry {
+            fg: blue;
+            active-fg: cyan;
+        }
+        button {
+            fg: blue;
+            active-fg: cyan;
+        }
+        #mode {
+            border: simple;
+            border-color: white;
+        }
+        #expressionColored {
+            border: corner;
+            border-color: white;
+        }
+    </style>
+
+    <script>
+        import re
+
+        mode = 0
+        expression = ""
+
+        exposants = tuple('⁰¹²³⁴⁵⁶⁷⁸⁹')
+
+        colors = {**COLORS.FG}
+        reset = colors['reset']
+        del colors['reset']
+        del colors['black']
+        del colors['white']
+        del colors['gray']
+        del colors['blue']
+        del colors['cyan']
+        colors = [*colors.values()][::-1] * 10
+    </script>
+
+    <entry id="calcul" spanrow="2">
+        {"Expression: "}
+        <function args="text">
+            expression = re.sub(
+                r"(\^[0-9]+)",
+                lambda matchstr: ''.join(
+                    exposants[int(num)] 
+                    for num in matchstr.group(0)[1:]
+                ),
+                text
+            )
+            expressionColored.set(expression)
+        </function>
+    </entry>
+    <text id="expressionColored" spanrow="4"></text>
+    <area id="mode" spanrow="3">
+        <button column="1" row="1">
+            Regroupement
+            <function>
+                index = 0
+                indexs = {}
+
+                def replace(matchstr):
+                    global index
+                    matchstr = matchstr.group(0)
+                    inconnue = None
+                    for i, carac in enumerate(matchstr):
+                        if carac not in '0123456789':
+                            inconnue = matchstr[i:]
+                    if inconnue not in indexs:
+                        indexs[inconnue] = index
+                        index += 1
+                    i = indexs[inconnue]
+                    return f"{colors[i]}{matchstr}{reset}"
+
+                expressionColored.set(re.sub(
+                    "("
+                    + r"(?=[\+\-\*\/]?)"
+                    + r"([0-9]*[a-z]{1}[" + ''.join(exposants) + "])"
+                    + r"|([0-9]+[a-z]{1})"
+                    + r"|([a-z]{1})"
+                    + r"|([0-9])"
+                    + r"(?=[\+\-\*\/\^]?)"
+                    + ")"
+                    ,
+                    replace,
+                    expression
+                ))
+            </function>
+        </button>
+        <button column="2" row="1">
+            Inconnues
+            <function>
+                index = 0
+                indexs = {}
+
+                def replace(matchstr):
+                    global index
+                    matchstr = matchstr.group(0)
+                    if matchstr not in indexs:
+                        indexs[matchstr] = index
+                        index += 1
+                    i = indexs[matchstr]
+                    return f"{colors[i]}{matchstr}{reset}"
+
+                expressionColored.set(re.sub(
+                    r"([a-z]{1})",
+                    replace,
+                    expression
+                ))
+            </function>
+        </button>
+        <button column="3" row="1">
+            Parentheses
+            <function>
+                index = -1
+                text__ = [*expression]
+
+                for i, carac in enumerate(expression):
+                    if carac == '(':
+                        index += 1
+                        text__[i] = f"{colors[index]}{carac}{reset}"
+                    elif carac == ')':
+                        text__[i] = f"{colors[index]}{carac}{reset}"
+                        index -= 1
+
+                expressionColored.set("".join(text__))
+            </function>
+        </button>
+    </area>
+</root>

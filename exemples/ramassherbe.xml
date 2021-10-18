@@ -1,0 +1,66 @@
+<!--
+Pitwi 0.5.1
+______________________________________________________________________________
+!-->
+
+<root width="87" height="28">
+    <style>
+        map {
+            border: simple;
+            active-border: double;
+            pos-bg: red;
+        }
+        #zone-inventaire {
+            border: simple;
+        }
+        #titre {
+            fg: white;
+            border: corner;
+        }
+    </style>
+    <script>
+        import random
+
+        ### Création de la map
+        # 2 2 2 2 2 
+        # 2 0 0 1 2
+        # 2 0 1 1 2
+        # 2 3 0 1 2
+        # 2 2 2 2 2 
+
+        taille = 15
+        matrice = '2 ' * (taille + 2) + '\n'
+        nbr_herbe = 0
+        herbe_ramassees = 0
+
+        for _ in range(taille):
+            matrice += '2 '
+            for _ in range(taille):
+                case = random.choice("0000001133")
+                matrice += case + ' '
+                if case == "1":
+                    nbr_herbe += 1
+            matrice += '2\n'
+        matrice += '2 ' * (taille + 2)
+    </script>
+    <text id="titre" spanrow="3">
+        {" " * (int(root.width / 2) - 6) + "Rammass'herbe"}
+    </text>
+    <area id="zone-inventaire" spanrow="3">
+        <text column="1" row="1" spancolumn="2">Herbe:</text>
+        <text column="2" row="1" id="herbe">0/{nbr_herbe}</text>
+    </area>
+    <map id="map" spanrow="11">
+        <cases>{matrice}</cases>
+        <tile name="0">{space(2)}</tile>
+        <tile name="1"> ;, </tile>
+        <tile name="2" collision="true"> [] </tile>
+        <tile name="3" collision="true"> /\ </tile>
+    </map>
+    <bind key="r" alias="R Space">
+        if map.map[map.pos['x']][map.pos['y']] == "1":
+            herbe_ramassees += 1
+            map.set(map.pos['x'], map.pos['y'], "0")
+            herbe.set(f"{herbe_ramassees}/{nbr_herbe}")
+    </bind>
+</root>
