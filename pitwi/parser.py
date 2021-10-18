@@ -153,11 +153,12 @@ def check_elements(widget, variables, simple=False):
                         part = ''
                 elif carac == '"' or carac == "'":
                     if last_symbol_text == carac:
-                        in_text = False
-                        last_symbol_text = None
-                    else:
-                        in_text = True
-                        last_symbol_text = carac
+                        if in_text:
+                            in_text = False
+                            last_symbol_text = None
+                        else:
+                            in_text = True
+                            last_symbol_text = carac
                     part += carac
                 else:
                     part += carac
@@ -342,9 +343,13 @@ def parser_in(widget_parent, node, variables):
         if widget == Ignore or widget_parent == Ignore:
             pass
 
-        elif isinstance(widget_parent, (Carousel, Menu)):
+        elif isinstance(widget_parent, Menu):
             widget_parent.add(
                 child.attrib.pop('value-button'), 
+                widget
+            )
+        elif isinstance(widget_parent, Carousel):
+            widget_parent.add(
                 widget
             )
         else:
