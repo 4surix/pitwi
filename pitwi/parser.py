@@ -181,8 +181,8 @@ def check_elements(widget, variables, simple=False):
 
             if simple:
                 value = result
-            elif isinstance(result, str):
-                text += result
+            elif isinstance(result, (str, int, float)):
+                text += str(result)
             elif isinstance(result, Iterable):
                 childs.extend(result)
             else:
@@ -211,8 +211,6 @@ def parser_in(widget_parent, node, variables):
 
         if not widget:
             continue
-
-        childs = []
 
         variables.update(child.attrib.pop('__local_vars', {}))
 
@@ -245,16 +243,38 @@ def parser_in(widget_parent, node, variables):
 
         child.attrib.update(style)
 
+        
+        if widget in (Style, Script):
+            widget((child.text if child.text else ''), variables)
+            continue
+
+        elif widget == Function:
+            if isinstance(widget_parent, (Entry, Button)):
+                widget_parent.function = widget(
+                    (child.text if child.text else ''),
+                    variables,
+                    child.attrib.get('args', "").split(' ')
+                )
+            continue
+
+        elif widget == Bind:
+            widget(
+                (child.text if child.text else ''),
+                variables,
+                child.attrib.get('key'),
+                child.attrib.get('alias', '').split(' '),
+            )
+            continue
+
+        text, childs = check_elements(child, variables)
 
         if widget in (Zone, Carousel):
             widget = widget(**child.attrib)
 
         elif widget in (Text, Text.Fish, Button, Scrolling):
-            text, childs = check_elements(child, variables)
             widget = widget(text, **child.attrib)
 
         elif widget == CheckButton:
-            text, childs = check_elements(child, variables)
             widget = widget(*text.split(';'), **child.attrib)
 
         elif widget == Menu:
@@ -269,29 +289,13 @@ def parser_in(widget_parent, node, variables):
             )
 
         elif widget == Entry:
-            text, childs = check_elements(child, variables)
             widget = widget(textleft=text, **child.attrib)
 
         elif widget == Map:
-            text, childs = check_elements(child, variables)
             widget = widget([], **child.attrib)
-
-        elif widget in (Style, Script):
-            widget((child.text if child.text else ''), variables)
-            continue
-
-        elif widget == Function:
-            if isinstance(widget_parent, (Entry, Button)):
-                widget_parent.function = widget(
-                    (child.text if child.text else ''),
-                    variables,
-                    child.attrib.get('args', "").split(' ')
-                )
-            continue
 
         elif widget == Tile:
             if isinstance(widget_parent, (Map)):
-                text, childs = check_elements(child, variables)
                 widget_parent.tile(
                     child.attrib.get('name'),
                     text,
@@ -301,7 +305,6 @@ def parser_in(widget_parent, node, variables):
 
         elif widget == Case:
             if isinstance(widget_parent, (Map)):
-                text, childs = check_elements(child, variables)
                 widget_parent.add_case(
                     child.attrib.get('x'),
                     child.attrib.get('y'),
@@ -321,18 +324,9 @@ def parser_in(widget_parent, node, variables):
                     widget_parent.add_case(
                         x,
                         y,
-                        text
+                        value
                     )
 
-            continue
-
-        elif widget == Bind:
-            widget(
-                (child.text if child.text else ''),
-                variables,
-                child.attrib.get('key'),
-                child.attrib.get('alias', '').split(' '),
-            )
             continue
 
 
