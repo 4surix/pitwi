@@ -131,6 +131,11 @@ class Map:
 
             self.map[x][y] = value
 
+        self.pos = {
+            'x': round(len(self.map) / 2), 
+            'y': round(len(self.map[0]) / 2) if self.map else 0
+        }
+
         return self
 
     def set(
@@ -267,7 +272,11 @@ class Map:
             return
         else:
             if case in self.collisions:
-                return
+                if x == y == 0:
+                    # When first generate map
+                    self.map[self.pos['x'] + x][self.pos['y'] + y] = None
+                else:
+                    return
 
         self.pos['x'] += x
         self.pos['y'] += y
@@ -315,8 +324,6 @@ class Map:
 
         self._info = (x, y, width, height)
 
-        input(width)
-
         if self._border:
             x, y, width, height = self._border.run(x, y, width, height)
 
@@ -324,8 +331,6 @@ class Map:
         self.y = y
         self.width = width
         self.height = height
-
-        input(width)
 
         self.move(0, 0)
 
