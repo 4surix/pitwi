@@ -112,7 +112,8 @@ p.start()
 
 def format_and_write(value, x, y, width, height, COLOR):
 
-    i = h = 0
+    i = 0
+    h = 0
 
     data = ''
     surplus = 0
@@ -136,32 +137,37 @@ def format_and_write(value, x, y, width, height, COLOR):
 
     while i < len_value and h < height:
 
+        len_carac_ANSII = 0
+
         if has_escape_chars:
 
-            def get_part(width):
+            v = 0
+            part__ = ''
 
-                i = 0
-                part__ = ''
+            for index, part in enumerate([*value_split]):
 
-                for index, part in enumerate([*value_split]):
-
-                    if index % 2 != 0:
-                        value_split.pop(0)
-                        part__ += part
-                        continue
-
-                    for char in part:
-                        i += 1
-                        part__ += char
-                        value_split[0] = value_split[0][1:]
-                        if i >= width:
-                            return part__
-
+                # ANSII carac
+                if index % 2 != 0:
                     value_split.pop(0)
+                    part__ += part
+                    len_carac_ANSII += len(part)
+                    continue
 
-                return part__
+                # Text carac
+                for char in part:
+                    i += 1
+                    v += 1
+                    part__ += char
+                    value_split[0] = value_split[0][1:]
+                    if v >= width - surplus:
+                        break
+                else:
+                    value_split.pop(0)
+                    continue
 
-            part = part__ = get_part(width - surplus)
+                break
+
+            part = part__
 
         else:
             part = part__ = value[i : i + width - surplus]
@@ -189,7 +195,7 @@ def format_and_write(value, x, y, width, height, COLOR):
 
         if index:
             h -= 1
-            surplus = len(part__) - index
+            surplus = len(part__) - index - len_carac_ANSII
 
     datas.append(data)
 
