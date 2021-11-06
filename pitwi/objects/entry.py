@@ -138,11 +138,10 @@ class Entry:
         if key == 'BackSpace':
             self.value = (
                 self.value[:self.index_char - 1]
-                + ''
                 + self.value[self.index_char:]
             )
-            end = " "
-            self.index_char -= 1
+            end = ' '
+            self.index_char = len(self.value)
 
         elif key == self.key:
             self.function(self.value)
@@ -151,13 +150,13 @@ class Entry:
             self.index_char = 0
 
         elif key == "Right":
-            if self.index_char != len(self.value):
+            if self.index_char < len(self.value):
                 self.index_char += 1
                 terminal.write("\033[1C")
             return
 
         elif key == "Left":
-            if self.index_char != 0:
+            if self.index_char > 0:
                 self.index_char -= 1
                 terminal.write("\033[1D")
             return
@@ -168,7 +167,7 @@ class Entry:
                 + key
                 + self.value[self.index_char:]
             )
-            self.index_char += 1
+            self.index_char = len(self.value)
 
         COLOR = COLORS.FG.get(self._fg, '') + COLORS.BG.get(self._bg, '')
         RESET = COLORS.FG.get('reset') + COLORS.BG.get('reset')
