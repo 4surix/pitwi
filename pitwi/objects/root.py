@@ -29,6 +29,8 @@ class Root(Zone):
         self.width -= 1
         self.height -= 1
 
+        terminal.DEBUG_write(f"NEW ROOT\nWIDTH={self.width} | HEIGHT={self.height}")
+
     def active(self):
         pass
 

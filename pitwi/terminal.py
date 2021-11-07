@@ -19,6 +19,14 @@ from . import colors
 from . import keypress
 
 
+DEBUG = True
+
+def DEBUG_write(data):
+    if DEBUG:
+        with open('DEBUG_PITWI.txt', 'a', encoding='utf-8') as f:
+            f.write(str(data)  + '\n\n\n@@@\n\n\n')
+
+
 current_os = platform.system()
 
 if current_os == 'Windows':
@@ -95,11 +103,13 @@ def run():
             keypress.getKey.unlisten()
 
             while datas:
-                sys.stdout.write(
+                data = (
                     datas.pop(0)
                     .encode(sys_stdout.encoding, 'replace')
                     .decode(sys_stdout.encoding, 'replace')
                 )
+                DEBUG_write(data)
+                sys.stdout.write(data)
 
             sys.stdout.flush()
 
@@ -137,7 +147,7 @@ def format_and_write(value, x, y, width, height, COLOR):
 
     while i < len_value and h < height:
 
-        len_carac_ANSII = 0
+        len_carac_ANSI = 0
 
         if has_escape_chars:
 
@@ -150,7 +160,7 @@ def format_and_write(value, x, y, width, height, COLOR):
                 if index % 2 != 0:
                     value_split.pop(0)
                     part__ += part
-                    len_carac_ANSII += len(part)
+                    len_carac_ANSI += len(part)
                     continue
 
                 # Text carac
@@ -195,7 +205,7 @@ def format_and_write(value, x, y, width, height, COLOR):
 
         if index:
             h -= 1
-            surplus = len(part__) - index - len_carac_ANSII
+            surplus = len(part__) - index - len_carac_ANSI
 
     datas.append(data)
 
