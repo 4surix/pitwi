@@ -180,7 +180,7 @@ def check_elements(widget, variables, simple=False):
             result = eval('(' + part.replace('\n', ' ') + ')', variables)
 
             if simple:
-                value = result
+                text = result
             elif isinstance(result, (str, int, float)):
                 text += str(result)
             elif isinstance(result, Iterable):
@@ -194,11 +194,8 @@ def check_elements(widget, variables, simple=False):
                 + (' ' if part[-1] == ' ' else '')
             )
 
-            if simple:
-                value = text
-
     if simple:
-        return value
+        return text
     else:
         return text, childs
 
@@ -440,7 +437,10 @@ def text(data:str, variables=None):
         .replace("\\>", "&gt;")
     )
 
-    root = Root(**base.attrib)
+    root = Root(**{
+        key: check_elements(value, variables, simple=True)
+        for key, value in base.attrib.items()
+    })
 
     variables['root'] = root
 

@@ -17,8 +17,10 @@ from .zone import Zone
 
 class Root(Zone):
 
-    def __init__(self, width:int = None, height:int = None):
+    def __init__(self, width:int = None, height:int = None, debug:bool = False):
         super().__init__()
+
+        terminal.debug = debug
 
         terminal.clearall()
         
