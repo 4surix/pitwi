@@ -209,6 +209,9 @@ def getName() -> str:
         elif key == '£':
             key = 'AltGr+Delete'
 
+        elif key == '\x94':
+            key = 'Ctrl+Tab'
+
         else:
             key = COMBI_ALTGR.get(key, key)
 

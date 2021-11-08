@@ -36,6 +36,20 @@ def next():
     boxs[index].active()
 
 
+def previous():
+
+    global index
+
+    boxs[index].inactive()
+
+    index -= 1
+
+    if index < 0:
+        index = len(boxs) - 1
+
+    boxs[index].active()
+
+
 def rem_all_childs_of_widget_hide(child):
     for child in getattr(child, 'childs', []):
         try: child.childs

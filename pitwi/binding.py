@@ -35,6 +35,10 @@ def run():
             navigation.next()
             continue
 
+        if key == 'Ctrl+Tab':
+            navigation.previous()
+            continue
+
         if entry_active:
             entry_active.add(key)
 
