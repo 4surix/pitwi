@@ -246,12 +246,16 @@ def parser_in(widget_parent, node, variables):
             continue
 
         elif widget == Function:
-            if isinstance(widget_parent, (Entry, Button)):
-                widget_parent.function = widget(
-                    (child.text if child.text else ''),
-                    variables,
-                    child.attrib.get('args', "").split(' ')
-                )
+            function = widget(
+                (child.text if child.text else ''),
+                variables,
+                child.attrib.get('args', "").split(' ')
+            )
+            # First beacause ChackButton is a subclass of Button
+            if isinstance(widget_parent, (CheckButton)):
+                widget_parent.callback = function
+            elif isinstance(widget_parent, (Entry, Button)):
+                widget_parent.function = function
             continue
 
         elif widget == Bind:
@@ -272,7 +276,7 @@ def parser_in(widget_parent, node, variables):
             widget = widget(text, **child.attrib)
 
         elif widget == CheckButton:
-            widget = widget(*text.split(';'), **child.attrib)
+            widget = widget(*[v.strip() for v in text.split(';')], **child.attrib)
 
         elif widget == Menu:
             widget = widget(**child.attrib)

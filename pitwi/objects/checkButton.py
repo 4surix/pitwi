@@ -14,6 +14,7 @@ class CheckButton(Button):
 
         super().__init__(**kwargs)
 
+        self.callback = None
         self.values = values
         self.index = 0
 
@@ -24,7 +25,7 @@ class CheckButton(Button):
         attrs.update(kwargs)
         return CheckButton(*(values or self.values), **attrs)
 
-    def change_value(self):
+    def change_value(self, value):
 
         self.index += 1
 
@@ -32,3 +33,6 @@ class CheckButton(Button):
             self.index = 0
 
         self.set(self.values[self.index])
+
+        if self.callback:
+            self.callback(value)
