@@ -165,7 +165,6 @@ def format_and_write(value, x, y, width, height, COLOR):
 
                 # Text carac
                 for char in part:
-                    i += 1
                     v += 1
                     part__ += char
                     value_split[0] = value_split[0][1:]
