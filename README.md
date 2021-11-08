@@ -82,6 +82,10 @@ The character `{` and `}` is used to use Python code online. Is same as f-string
 `<tag>{f"Pomme {{poire}} fraise"}</tag>` == `<tag>Pomme {poire} fraise</tag>`  
   
 The characters `<`, `>` is depreciated because XML not supported in text. Use escape character to use it. `<tag>Puik \<puf\> paf</tag>`  
+
+## Selection :
+
+Press `Tab` to select next element and `Ctrl+Tab` to select previous element.  
   
 ## Colors :
 
